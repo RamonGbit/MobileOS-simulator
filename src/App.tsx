@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StatusBar from './ui/StatusBar';
 import Dock from './ui/Dock';
+import LockScreen from './ui/LockScreen';
 
 const App: React.FC = () => {
+  const [isLocked, setIsLocked] = useState(true);
+
   return (
     <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
       {/* Mobile Device Frame */}
@@ -34,6 +37,11 @@ const App: React.FC = () => {
 
         {/* Home Indicator (iPhone style) */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/40 rounded-full z-20" />
+
+        {/* Lock Screen Overlay */}
+        {isLocked && (
+          <LockScreen onUnlock={() => setIsLocked(false)} />
+        )}
       </div>
     </div>
   );
