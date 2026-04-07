@@ -117,4 +117,5 @@ const LockScreen: React.FC<LockScreenProps> = ({ onUnlock }) => {
   );
 };
 
+export { default as PowerButton } from './PowerButton';
 export default LockScreen;
