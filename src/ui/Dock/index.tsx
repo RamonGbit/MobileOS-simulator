@@ -12,7 +12,7 @@ const DockItem = ({ icon: Icon, label, color }: { icon: any, label: string, colo
   </motion.div>
 );
 
-const Dock: React.FC = () => {
+const Dock: React.FC<{ onAppClick: (app: string) => void }> = ({ onAppClick }) => {
   const apps = [
     { icon: Phone, label: "Phone", color: "bg-ios-green" },
     { icon: MessageSquare, label: "Messages", color: "bg-ios-blue" },
@@ -24,11 +24,14 @@ const Dock: React.FC = () => {
     <div className="w-full flex justify-center pb-8 px-4 select-none">
       <div className="flex items-center space-x-4 bg-white/20 backdrop-blur-xl p-3.5 rounded-mobile border border-white/30 shadow-2xl">
         {apps.map((app, index) => (
-          <DockItem key={index} {...app} />
+          <div key={index} onClick={() => onAppClick(app.label)}>
+            <DockItem icon={app.icon} label={app.label} color={app.color} />
+          </div>
         ))}
       </div>
     </div>
   );
 };
+
 
 export default Dock;
