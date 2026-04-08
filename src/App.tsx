@@ -8,9 +8,20 @@ import { VolumeHUD } from './ui/System';
 
 const App: React.FC = () => {
   const [isLocked, setIsLocked] = useState(true);
+  const [isScreenOn, setIsScreenOn] = useState(true);
   const [volume, setVolume] = useState(50);
   const [showVolumeHUD, setShowVolumeHUD] = useState(false);
   const volumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handlePowerButton = () => {
+    if (isScreenOn) {
+      setIsScreenOn(false);
+      setIsLocked(true);
+    } else {
+      setIsScreenOn(true);
+    }
+  };
+
 
   const handleVolumeChange = (type: 'up' | 'down') => {
     setVolume(prev => {
@@ -40,7 +51,8 @@ const App: React.FC = () => {
       <div className="relative">
         
         {/* Physical Buttons */}
-        <PowerButton onPress={() => setIsLocked(true)} />
+        <PowerButton onPress={handlePowerButton} />
+
         <VolumeButtons 
           onVolumeUp={() => handleVolumeChange('up')} 
           onVolumeDown={() => handleVolumeChange('down')} 
@@ -87,10 +99,25 @@ const App: React.FC = () => {
 
           {/* Lock Screen Overlay with AnimatePresence */}
           <AnimatePresence>
-            {isLocked && (
+            {isLocked && isScreenOn && (
               <LockScreen onUnlock={() => setIsLocked(false)} />
             )}
           </AnimatePresence>
+
+          {/* Sleep Screen Overlay */}
+          <AnimatePresence>
+            {!isScreenOn && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 bg-black z-[100] cursor-pointer"
+                onClick={() => setIsScreenOn(true)}
+              />
+            )}
+          </AnimatePresence>
+
         </div>
       </div>
     </div>
