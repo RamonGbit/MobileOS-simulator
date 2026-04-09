@@ -119,15 +119,15 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                  });
                  
                  // Minimum idle OS drain
-                 totalDrain += 0.05;
+                 totalDrain += 0.01;
 
                  return Math.max(0, prev - totalDrain);
              });
         };
 
-        // Every 3 seconds in demo time so the user can easily see it drop a little bit
+        // Every 8 seconds in demo time so it feels progressive but not stressful
         // For real-time, change to 60000 
-        const intervalId = setInterval(drainBattery, 3000); 
+        const intervalId = setInterval(drainBattery, 8000); 
 
         return () => clearInterval(intervalId);
     }, [runningAppIds, activeApp, isCharging]);
