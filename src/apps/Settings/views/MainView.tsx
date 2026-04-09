@@ -1,8 +1,10 @@
 import React from 'react';
-import { Wifi, Bluetooth, Lock, Info, User, ShieldCheck, Image } from 'lucide-react';
+import { Wifi, Bluetooth, Lock, Info, User, ShieldCheck, Image, Cpu, HardDrive } from 'lucide-react';
 import SettingRow from '../components/SettingRow';
 import SettingSection from '../components/SettingSection';
 import { FileSystem } from '../../../kernel/FileSystem';
+import { useSystem } from '../../../contexts/SystemContext';
+import { SYSTEM_CONFIG } from '../../../types/System';
 
 interface MainViewProps {
   onNavigate: (view: string) => void;
@@ -10,6 +12,7 @@ interface MainViewProps {
 
 const MainView: React.FC<MainViewProps> = ({ onNavigate }) => {
   const settings = FileSystem.getSettings();
+  const { usedMemoryMB } = useSystem();
 
   return (
     <div className="flex-1 overflow-y-auto pb-20 pt-4 custom-scrollbar">
@@ -72,11 +75,23 @@ const MainView: React.FC<MainViewProps> = ({ onNavigate }) => {
       </SettingSection>
 
       {/* System Section */}
-      <SettingSection title="System">
+      <SettingSection title="System Resources">
+        <SettingRow 
+          icon={Cpu} 
+          label="RAM" 
+          value={`${usedMemoryMB} MB / ${SYSTEM_CONFIG.TOTAL_RAM_MB} MB`}
+          iconColor="bg-ios-gray"
+        />
+        <SettingRow 
+          icon={HardDrive} 
+          label="Storage" 
+          value={`14.2 GB / ${SYSTEM_CONFIG.TOTAL_STORAGE_GB} GB`}
+          iconColor="bg-ios-gray"
+        />
         <SettingRow 
           icon={Info} 
-          label="General" 
-          iconColor="bg-ios-gray"
+          label="About Simulator" 
+          iconColor="bg-ios-blue"
           onClick={() => onNavigate('about')}
         />
       </SettingSection>

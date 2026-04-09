@@ -7,13 +7,16 @@ import SettingsApp from './apps/Settings';
 import { PowerButton, VolumeButtons } from './ui/Hardware';
 import { VolumeHUD } from './ui/System';
 import { WallpaperProvider, useWallpaper } from './contexts/WallpaperContext';
+import { SystemProvider, useSystem } from './contexts/SystemContext';
+import TaskSwitcher from './ui/TaskSwitcher';
 
 
 const AppContent: React.FC = () => {
   const { wallpaper } = useWallpaper();
+  const { activeApp, toggleTaskSwitcher, goHome } = useSystem();
+  
   const [isLocked, setIsLocked] = useState(true);
   const [isScreenOn, setIsScreenOn] = useState(true);
-  const [activeApp, setActiveApp] = useState<string | null>(null);
   const [volume, setVolume] = useState(50);
   const [showVolumeHUD, setShowVolumeHUD] = useState(false);
   const volumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -102,7 +105,7 @@ const AppContent: React.FC = () => {
                   </div>
 
                   {/* Bottom: Floating Dock */}
-                  <Dock onAppClick={(app) => !isLocked && setActiveApp(app)} />
+                  <Dock />
                 </motion.div>
               ) : (
                 /* Full Screen App Layer */
@@ -116,7 +119,7 @@ const AppContent: React.FC = () => {
                 >
                   {/* We add top padding to the app to avoid status bar overlap if necessary */}
                   <div className="h-full pt-8">
-                    {activeApp === 'Settings' && <SettingsApp onClose={() => setActiveApp(null)} />}
+                    {activeApp === 'Settings' && <SettingsApp onClose={() => goHome()} />}
                   </div>
                 </motion.div>
               )}
@@ -125,7 +128,14 @@ const AppContent: React.FC = () => {
 
 
           {/* Home Indicator (iPhone style) */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/40 rounded-full z-20" />
+          <div className="absolute bottom-0 left-0 w-full h-8 z-50 flex items-center justify-center pointer-events-auto cursor-pointer group"
+               onClick={() => goHome()}
+               onDoubleClick={() => toggleTaskSwitcher()}
+          >
+              <div className="w-32 h-1.5 bg-white/40 group-hover:bg-white/70 transition-colors rounded-full" />
+          </div>
+
+          <TaskSwitcher />
 
           {/* Visual HUDs */}
           <VolumeHUD volume={volume} isVisible={showVolumeHUD} />
@@ -158,9 +168,11 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => (
-  <WallpaperProvider>
-    <AppContent />
-  </WallpaperProvider>
+  <SystemProvider>
+    <WallpaperProvider>
+      <AppContent />
+    </WallpaperProvider>
+  </SystemProvider>
 );
 
 export default App;

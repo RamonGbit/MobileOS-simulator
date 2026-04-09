@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Phone, MessageSquare, Settings, Globe } from 'lucide-react';
 
+import { useSystem } from '../../contexts/SystemContext';
+
 const DockItem = ({ icon: Icon, label, color }: { icon: any, label: string, color: string }) => (
   <motion.div
     whileHover={{ y: -10, scale: 1.1 }}
@@ -12,7 +14,9 @@ const DockItem = ({ icon: Icon, label, color }: { icon: any, label: string, colo
   </motion.div>
 );
 
-const Dock: React.FC<{ onAppClick: (app: string) => void }> = ({ onAppClick }) => {
+const Dock: React.FC = () => {
+  const { launchApp } = useSystem();
+  
   const apps = [
     { icon: Phone, label: "Phone", color: "bg-ios-green" },
     { icon: MessageSquare, label: "Messages", color: "bg-ios-blue" },
@@ -24,7 +28,7 @@ const Dock: React.FC<{ onAppClick: (app: string) => void }> = ({ onAppClick }) =
     <div className="w-full flex justify-center pb-8 px-4 select-none">
       <div className="flex items-center space-x-4 bg-white/20 backdrop-blur-xl p-3.5 rounded-mobile border border-white/30 shadow-2xl">
         {apps.map((app, index) => (
-          <div key={index} onClick={() => onAppClick(app.label)}>
+          <div key={index} onClick={() => launchApp(app.label)}>
             <DockItem icon={app.icon} label={app.label} color={app.color} />
           </div>
         ))}
