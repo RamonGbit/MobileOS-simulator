@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSystem } from '../../contexts/SystemContext';
 
 const TaskSwitcher: React.FC = () => {
-    const { runningApps, isTaskSwitcherOpen, launchApp, killApp, toggleTaskSwitcher } = useSystem();
+    const { runningApps, isTaskSwitcherOpen, launchApp, killApp, killAllApps, toggleTaskSwitcher } = useSystem();
 
     return (
         <AnimatePresence>
@@ -21,6 +21,16 @@ const TaskSwitcher: React.FC = () => {
                         }
                     }}
                 >
+                    {runningApps.length > 0 && (
+                        <motion.button
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            onClick={() => killAllApps()}
+                            className="absolute top-12 right-8 z-[60] px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-semibold border border-white/20 transition-all active:scale-95"
+                        >
+                            Cerrar todo
+                        </motion.button>
+                    )}
                     {runningApps.length === 0 ? (
                         <div className="w-full text-center text-white/50 font-medium">
                             No Recent Apps

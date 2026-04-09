@@ -12,6 +12,7 @@ interface SystemContextType {
     // Actions
     launchApp: (appId: string) => void;
     killApp: (appId: string) => void;
+    killAllApps: () => void;
     goHome: () => void;
     toggleTaskSwitcher: (state?: boolean) => void;
     toggleCharging: () => void;
@@ -79,6 +80,11 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
     }, [activeApp]);
 
+    const killAllApps = useCallback(() => {
+        setRunningAppIds([]);
+        setActiveApp(null);
+    }, []);
+
     const goHome = useCallback(() => {
         setActiveApp(null);
         setIsTaskSwitcherOpen(false);
@@ -144,6 +150,7 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             usedMemoryMB,
             launchApp,
             killApp,
+            killAllApps,
             goHome,
             toggleTaskSwitcher,
             toggleCharging
