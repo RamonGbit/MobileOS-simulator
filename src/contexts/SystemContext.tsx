@@ -6,6 +6,7 @@ interface SystemContextType {
     activeApp: string | null;
     isTaskSwitcherOpen: boolean;
     batteryLevel: number;
+    isCharging: boolean;
     usedMemoryMB: number;
     
     // Actions
@@ -13,6 +14,7 @@ interface SystemContextType {
     killApp: (appId: string) => void;
     goHome: () => void;
     toggleTaskSwitcher: (state?: boolean) => void;
+    toggleCharging: () => void;
 }
 
 const SystemContext = createContext<SystemContextType | undefined>(undefined);
@@ -29,6 +31,7 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     // Battery and Memory states
     const [batteryLevel, setBatteryLevel] = useState(100);
+    const [isCharging, setIsCharging] = useState(false);
 
     const getUsedMemory = (appIds: string[]) => {
         return appIds.reduce((acc, id) => {
@@ -85,10 +88,19 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setIsTaskSwitcherOpen(prev => state !== undefined ? state : !prev);
     }, []);
 
+    const toggleCharging = useCallback(() => {
+        setIsCharging(prev => !prev);
+    }, []);
+
     // Effect for battery drain simulation (1 "tick" every minute)
     useEffect(() => {
         const drainBattery = () => {
              setBatteryLevel(prev => {
+                 if (isCharging) {
+                     // Charge quickly for demonstration purposes
+                     return Math.min(100, prev + 2);
+                 }
+
                  if (prev <= 0) return 0;
                  
                  // Calculate drain based on running apps
@@ -118,7 +130,7 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const intervalId = setInterval(drainBattery, 3000); 
 
         return () => clearInterval(intervalId);
-    }, [runningAppIds, activeApp]);
+    }, [runningAppIds, activeApp, isCharging]);
 
     const runningApps = runningAppIds.map(id => APP_REGISTRY[id]).filter(Boolean) as AppConfig[];
 
@@ -128,11 +140,13 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             activeApp,
             isTaskSwitcherOpen,
             batteryLevel,
+            isCharging,
             usedMemoryMB,
             launchApp,
             killApp,
             goHome,
-            toggleTaskSwitcher
+            toggleTaskSwitcher,
+            toggleCharging
         }}>
             {children}
         </SystemContext.Provider>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { BatteryCharging } from 'lucide-react';
 import StatusBar from './ui/StatusBar';
 import Dock from './ui/Dock';
 import LockScreen from './ui/LockScreen';
@@ -13,7 +14,7 @@ import TaskSwitcher from './ui/TaskSwitcher';
 
 const AppContent: React.FC = () => {
   const { wallpaper } = useWallpaper();
-  const { activeApp, toggleTaskSwitcher, goHome } = useSystem();
+  const { activeApp, toggleTaskSwitcher, goHome, batteryLevel, isCharging, toggleCharging } = useSystem();
   
   const [isLocked, setIsLocked] = useState(true);
   const [isScreenOn, setIsScreenOn] = useState(true);
@@ -22,7 +23,16 @@ const AppContent: React.FC = () => {
   const volumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 
+  useEffect(() => {
+    if (batteryLevel === 0) {
+      setIsScreenOn(false);
+    }
+  }, [batteryLevel]);
+
   const handlePowerButton = () => {
+    // If battery is dead, power button does not turn it on
+    if (batteryLevel === 0 && !isScreenOn) return;
+
     if (isScreenOn) {
       setIsScreenOn(false);
       setIsLocked(true);
@@ -58,6 +68,13 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-4">
       {/* Device Wrapper */}
       <div className="relative">
+
+        <button 
+           onClick={toggleCharging}
+           className={`absolute -top-16 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full font-semibold text-sm transition-colors ${isCharging ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+        >
+           {isCharging ? '🔌 Unplug Charger' : '🔌 Plug in Charger'}
+        </button>
 
         {/* Physical Buttons */}
         <PowerButton onPress={handlePowerButton} />
@@ -147,7 +164,7 @@ const AppContent: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Sleep Screen Overlay */}
+          {/* Sleep Screen Overlay (or dead battery) */}
           <AnimatePresence>
             {!isScreenOn && (
               <motion.div
@@ -155,9 +172,17 @@ const AppContent: React.FC = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="absolute inset-0 bg-black z-[100] cursor-pointer"
-                onClick={() => setIsScreenOn(true)}
-              />
+                className={`absolute inset-0 bg-black z-[100] ${batteryLevel === 0 ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                onClick={() => {
+                  if (batteryLevel > 0) setIsScreenOn(true);
+                }}
+              >
+                {batteryLevel === 0 && isCharging && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <BatteryCharging className="text-white/20 animate-pulse" size={64} />
+                  </div>
+                )}
+              </motion.div>
             )}
           </AnimatePresence>
 

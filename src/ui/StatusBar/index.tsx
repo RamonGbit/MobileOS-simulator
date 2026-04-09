@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Signal, Wifi, Battery } from 'lucide-react';
+import { Signal, Wifi, Battery, BatteryCharging } from 'lucide-react';
 import { useSystem } from '../../contexts/SystemContext';
 
 const StatusBar: React.FC = () => {
     const [time, setTime] = useState(new Date());
-    const { batteryLevel } = useSystem();
+    const { batteryLevel, isCharging } = useSystem();
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
@@ -28,7 +28,11 @@ const StatusBar: React.FC = () => {
                 <Wifi size={16} strokeWidth={2.5} className="drop-shadow-md" />
                 <div className="flex items-center space-x-1">
                     <span className="text-xs font-semibold drop-shadow-md">{Math.round(batteryLevel)}%</span>
-                    <Battery size={20} strokeWidth={2.5} className="rotate-0 drop-shadow-md" />
+                    {isCharging ? (
+                        <BatteryCharging size={20} strokeWidth={2.5} className="rotate-0 drop-shadow-md text-green-400" />
+                    ) : (
+                        <Battery size={20} strokeWidth={2.5} className="rotate-0 drop-shadow-md" />
+                    )}
                 </div>
             </div>
         </div>
